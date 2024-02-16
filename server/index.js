@@ -69,13 +69,27 @@ app.post('/login', async (req,res) => {
   }
 });
 // Profile endpoint
-app.get('/profile', (req,res) => {
-  const {token} = req.cookies;
-console.log(token)
-  // jwt.verify(token, secret, {}, (err,info) => {
-  //   if (err) throw err;
-  //   res.json(info);
-  // });
+
+app.get('/profile', (req, res) => {
+  // Extract the token from the cookie
+  const token = req.cookies.token;
+
+  // Check if token exists
+  if (!token) {
+    console.log(token)
+    return res.status(401).json({ error: 'JWT token missing' });
+  }
+
+  // Verify the token
+  jwt.verify(token, secret, {}, (err, info) => {
+    if (err) {
+      // If verification fails, send an error response
+      return res.status(401).json({ error: 'Invalid JWT token' });
+    }
+    
+    // If verification succeeds, send the decoded token info
+    res.json(info);
+  });
 });
 
 
